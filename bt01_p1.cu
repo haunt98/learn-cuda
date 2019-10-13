@@ -125,12 +125,12 @@ __global__ void convertRgb2GrayKernel(uint8_t * inPixels, int width, int height,
 		uint8_t * outPixels)
 {
 	// TODO
-	int c = threadIdx.x + blockIdx.x * blockDim.x;
-	int r = threadIdx.y + blockIdx.y * blockDim.y;
+	int row = threadIdx.x + blockIdx.x * blockDim.x;
+	int col = threadIdx.y + blockIdx.y * blockDim.y;
 	
-	if (r < width && c < height)
+	if (row < height && col < width)
 	{
-		int i = r * width + c;
+		int i = row * width + col;
 		uint8_t red = inPixels[i * 3];
 		uint8_t green = inPixels[i * 3 + 1];
 		uint8_t blue = inPixels[i * 3 + 2];
@@ -174,7 +174,7 @@ void convertRgb2Gray(uint8_t * inPixels, int width, int height,
         CHECK(cudaMemcpy(d_inPixels, inPixels, width * height * 3 * sizeof(uint8_t), cudaMemcpyHostToDevice));
 
 		// TODO: Set grid size and call kernel (remember to check kernel error)
-        dim3 gridSize((width - 1) / blockSize.x + 1, (height - 1) / blockSize.y + 1);
+        dim3 gridSize((height - 1) / blockSize.x + 1, (width - 1) / blockSize.y + 1);
 		convertRgb2GrayKernel<<<gridSize, blockSize>>>(d_inPixels, width, height, d_outPixels);
 
 		// TODO: Copy result from device memories
